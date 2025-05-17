@@ -31,5 +31,5 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         run: |
           docker build -t ppiyong .
-          docker tag ppiyong:latest 312710419001.dkr.ecr.ap-northeast-2.amazonaws.com/ppiyong:latest
-          docker push 312710419001.dkr.ecr.ap-northeast-2.amazonaws.com/ppiyong:latest
+          docker tag ppiyong:latest ${{ secrets.ECR_URI }}/ppiyong:latest
+          docker push ${{ secrets.ECR_URI }}/ppiyong:latest
