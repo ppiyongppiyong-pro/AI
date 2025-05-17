@@ -6,7 +6,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 코드 복사
-COPY ppiyong_app ./ppiyong-chatbot
+COPY ppiyong_app.py ./ppiyong-chatbot
 
 EXPOSE 8000
 
