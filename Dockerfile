@@ -1,12 +1,11 @@
-# 베이스 이미지: Python 3.10
-FROM python:3.10
+FROM python:3.10-slim
 
-# 필요 패키지 설치
+WORKDIR /app
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 코드 복사
-COPY ppiyong_app.py .
+COPY . .
 
 EXPOSE 8000
 
