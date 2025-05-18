@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-
       - name: Check out code
         uses: actions/checkout@v2
 
@@ -33,3 +32,49 @@ jobs:
           docker build -t ppiyong .
           docker tag ppiyong:latest ${{ secrets.ECR_URI }}/ppiyong:latest
           docker push ${{ secrets.ECR_URI }}/ppiyong:latest
+
+  transfer:
+    runs-on: ubuntu-24.04
+    needs: build
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Transfer app config to EC2
+        uses: appleboy/scp-action@master
+        with:
+            host: ${{ secrets.REMOTE_HOST }}
+            username: ${{ secrets.REMOTE_USER }}
+            key: ${{ secrets.SSH_PRIVATE_KEY }}
+            source: |
+              ./docker-compose.yml
+              ./rag_data/
+              ./chroma_db/
+            target: /home/ubuntu/ppiyong-chatbot/
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-24.04
+    needs: transfer
+    steps:
+      - name: SSH into EC2 server and Deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            # 1. cd
+            mkdir -p ~/ppiyong-chatbot
+            cd ~/ppiyong-chatbot
+            
+            # 2. Image pull
+            docker pull ${{ secrets.ECR_URI }}/ppiyong:latest
+            
+            # 3. docker compose
+            docker-compose down
+            docker-compose up -d --remove-orphans
+            
+            # 4. remove oldest image
+            docker image prune -a -f
