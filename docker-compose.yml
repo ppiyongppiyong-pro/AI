@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  ppiyong-app:
+    image: ${secrets.ECR_URI}/ppiyong:latest
+
+    container_name: ppiyong-chatbot
+
+    volumes:
+      - ./rag_data:/app/rag_data
+      - ./chroma_db:/app/chroma_db
+
+    ports:
+      - "8000:8000"
+
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
