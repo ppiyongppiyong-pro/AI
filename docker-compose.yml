@@ -2,13 +2,13 @@ version: "3.9"
 
 services:
   ppiyong-app:
-    image: ${secrets.ECR_URI}/ppiyong:latest
+    image: ${ECR_URI}/ppiyong:latest
 
     container_name: ppiyong-chatbot
 
     volumes:
-      - ./rag_data:/app/rag_data
-      - ./chroma_db:/app/chroma_db
+      - ./rag_data:/ppiyong-chatbot/rag_data
+      - ./chroma_db:/ppiyong-chatbot/chroma_db
 
     ports:
       - "8000:8000"
