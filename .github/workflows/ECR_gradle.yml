@@ -7,30 +7,30 @@ on:
 
 jobs:
 
-  build:
-    name: Build Image
-    runs-on: ubuntu-24.04
+  # build:
+  #   name: Build Image
+  #   runs-on: ubuntu-24.04
 
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+  #   steps:
+  #     - name: Check out code
+  #       uses: actions/checkout@v2
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: ap-northeast-2
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+  #         aws-region: ap-northeast-2
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+  #     - name: Login to Amazon ECR
+  #       id: login-ecr
+  #       uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR
-        run: |
-          docker build -t ppiyong .
-          docker tag ppiyong:latest ${{ secrets.ECR_URI }}/ppiyong:latest
-          docker push ${{ secrets.ECR_URI }}/ppiyong:latest
+  #     - name: Build, tag, and push image to Amazon ECR
+  #       run: |
+  #         docker build -t ppiyong .
+  #         docker tag ppiyong:latest ${{ secrets.ECR_URI }}/ppiyong:latest
+  #         docker push ${{ secrets.ECR_URI }}/ppiyong:latest
 
   transfer:
     runs-on: ubuntu-24.04
@@ -42,36 +42,14 @@ jobs:
       - name: Check directories before SCP
         run: ls -al ./rag_data && ls -al ./chroma_db
 
-      - name: Clean remote directory before SCP
-        uses: appleboy/ssh-action@master
+      - name: Transfer docker-compose.yaml file to ec2
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            sudo rm -f /home/${{ secrets.REMOTE_USER }}/ppiyong-chatbot/docker-compose.yml
-
-      - name: Transfer docker-compose.yml to EC2
-        uses: appleboy/scp-action@master
-        with:
-            host: ${{ secrets.REMOTE_HOST }}
-            username: ${{ secrets.REMOTE_USER }}
-            key: ${{ secrets.SSH_PRIVATE_KEY }}
-            source: ./docker-compose.yml
-            target: /home/${{ secrets.REMOTE_USER }}/ppiyong-chatbot/
-            port: 22
-
-      - name: Fix permissions of transferred docker-compose.yml
-        uses: appleboy/ssh-action@master
-        with:
-            host: ${{ secrets.REMOTE_HOST }}
-            username: ${{ secrets.REMOTE_USER }}
-            key: ${{ secrets.SSH_PRIVATE_KEY }}
-            port: 22
-            script: |
-                sudo chown ${{ secrets.REMOTE_USER }}:${{ secrets.REMOTE_USER }} /home/${{ secrets.REMOTE_USER }}/ppiyong-chatbot/docker-compose.yml
-                sudo chmod 644 /home/${{ secrets.REMOTE_USER }}/ppiyong-chatbot/docker-compose.yml
+          source: ./docker-compose.yaml
+          target: /home/ubuntu/
 
   deploy:
     name: Deploy
@@ -92,11 +70,16 @@ jobs:
 
             # 2. .env file
             echo "${{ secrets.ENV }}" > .env
+            sudo chmod 600 .env
             
-            # 3. Image pull
+            # 3. Copy docker-compose.yml
+            cd ~
+            sudo cp /home/ubuntu/docker-compose.yml /home/ubuntu/ppiyong-chatbot/
+
+            #4. pull Image
             docker pull ${{ secrets.ECR_URI }}/ppiyong:latest
             
-            # 4. docker compose
+            # 5. docker compose up
             docker compose down
             docker compose up -d --remove-orphans
             
