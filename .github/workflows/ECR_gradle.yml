@@ -46,8 +46,8 @@ jobs:
       - name: Clean remote directory before SCP
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_HOST }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
