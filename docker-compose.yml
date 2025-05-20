@@ -7,12 +7,19 @@ services:
     container_name: ppiyong-chatbot
 
     volumes:
-      - ./rag_data:/ppiyong-chatbot/rag_data
-      - ./chroma_db:/ppiyong-chatbot/chroma_db
+      - /home/ubuntu/ppiyong-chatbot/rag_data:/ppiyong-chatbot/rag_data
+      - /home/ubuntu/ppiyong-chatbot/chroma_db:/ppiyong-chatbot/chroma_db
 
     ports:
       - "8000:8000"
 
     environment:
       - PYTHONUNBUFFERED=1
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
     restart: unless-stopped
