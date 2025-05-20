@@ -79,8 +79,16 @@ jobs:
             # 1. cd
             mkdir -p ~/ppiyong-chatbot
             cd ~/ppiyong-chatbot
+
+            # 2. .env file
+            echo "${{ secrets.ENV }}" > .env
+            sudo chmod 600 .env
             
-            # 2. Image pull
+            # 3. Copy docker-compose.yml
+            cd ~
+            sudo cp /home/ubuntu/docker-compose.yml /home/ubuntu/ppiyong-chatbot/
+
+            #4. pull Image
             docker pull ${{ secrets.ECR_URI }}/ppiyong:latest
             
             # 3. docker compose

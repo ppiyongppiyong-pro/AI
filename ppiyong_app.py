@@ -66,7 +66,7 @@ model = PeftModel.from_pretrained(
     trust_remote_code=True,
     device_map="auto"
 )
-
+model = model.half().to(device)
 # Hugging Face pipeline 생성
 print("Pipeline 생성 중...")
 pipe = pipeline(
