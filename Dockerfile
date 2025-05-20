@@ -1,6 +1,12 @@
-FROM python:3.10-slim
+# Ndivida docker image - cuda 모델 설정
+FROM nvidia/cuda:12.1.0-runtime-ubuntu20.04
 
 WORKDIR /ppiyong-chatbot
+
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
+    pip install --upgrade pip
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
