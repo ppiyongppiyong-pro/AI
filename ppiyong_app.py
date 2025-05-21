@@ -47,17 +47,27 @@ else:
 base_model_id = "Bllossom/llama-3.2-Korean-Bllossom-3B"
 adapter_model_id = "hjjummy/llama-3.2-Korean-emergency-3B-lora-adapter4"
 
+# config 로드 및 rope_scaling 정제
+print("Config 정제 및 모델 로드 중...")
+config = AutoConfig.from_pretrained(base_model_id, trust_remote_code=True)
+if hasattr(config, "rope_scaling"):
+    config.rope_scaling = {
+        "type": "linear",
+        "factor": config.rope_scaling.get("factor", 32.0)
+    }
+
 # 모델 로드
 print("모델 로드 중...")
+# 모델 및 토크나이저 로드
+tokenizer = AutoTokenizer.from_pretrained(base_model_id)
 base_model = AutoModelForCausalLM.from_pretrained(
     base_model_id,
+    config=config,
     trust_remote_code=True,
     device_map="auto",
     torch_dtype=torch.float16,
     low_cpu_mem_usage=True
 )
-tokenizer = AutoTokenizer.from_pretrained(base_model_id)
-
 # LoRA 어댑터 결합
 print("LoRA 어댑터 로드 중...")
 model = PeftModel.from_pretrained(
