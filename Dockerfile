@@ -4,12 +4,14 @@ FROM nvidia/cuda:12.1.0-runtime-ubuntu20.04
 WORKDIR /ppiyong-chatbot
 
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip && \
+    apt-get install -y python3 python3-pip git && \
     ln -s /usr/bin/python3 /usr/bin/python && \
-    pip install --upgrade pip
+    pip install --upgrade pip \
 
 RUN pip install torch==2.2.2+cu121 --extra-index-url https://download.pytorch.org/whl/cu121 && \
     pip cache purge
+
+RUN pip install git+https://github.com/huggingface/transformers.git
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

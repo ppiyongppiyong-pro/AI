@@ -93,6 +93,3 @@ jobs:
             # 3. docker compose
             docker-compose down
             docker-compose up -d --build
-            
-            # 4. remove oldest image
-            docker image prune -a -f
