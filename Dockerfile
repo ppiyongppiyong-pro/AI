@@ -11,8 +11,6 @@ RUN apt-get update && \
 RUN pip install torch==2.2.2+cu121 --extra-index-url https://download.pytorch.org/whl/cu121 && \
     pip cache purge
 
-RUN pip install git+https://github.com/huggingface/transformers.git
-
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
