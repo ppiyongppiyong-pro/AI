@@ -1,12 +1,13 @@
 fastapi
 uvicorn
 
-langchain
-langchain-community
-sentence-transformers
+langchain==0.1.14
+langchain-community==0.0.26
+sentence-transformers==2.2.2
 chromadb
-peft
+peft==0.10.0
+accelerate==0.28.0
 
-transformers
+transformers==4.40.2
 
 boto3
