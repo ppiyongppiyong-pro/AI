@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig, pipeline
 from langchain_community.llms import HuggingFacePipeline
 from langchain.schema.runnable import RunnableSequence, RunnableMap, RunnableLambda
 from langchain.prompts import PromptTemplate
@@ -10,7 +10,6 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
-
 from peft import PeftModel
 import torch
 
@@ -56,8 +55,6 @@ if hasattr(config, "rope_scaling"):
         "factor": config.rope_scaling.get("factor", 32.0)
     }
 
-# 모델 로드
-print("모델 로드 중...")
 # 모델 및 토크나이저 로드
 tokenizer = AutoTokenizer.from_pretrained(base_model_id)
 base_model = AutoModelForCausalLM.from_pretrained(
@@ -68,6 +65,7 @@ base_model = AutoModelForCausalLM.from_pretrained(
     torch_dtype=torch.float16,
     low_cpu_mem_usage=True
 )
+
 # LoRA 어댑터 결합
 print("LoRA 어댑터 로드 중...")
 model = PeftModel.from_pretrained(
@@ -77,13 +75,18 @@ model = PeftModel.from_pretrained(
     device_map="auto"
 )
 model = model.half().to(device)
+
+# pad_token_id 보완
+pad_token_id = tokenizer.pad_token_id or tokenizer.eos_token_id
+
 # Hugging Face pipeline 생성
 print("Pipeline 생성 중...")
 pipe = pipeline(
     "text-generation",
     model=model,
     tokenizer=tokenizer,
-    device=0  # CUDA 디바이스 사용
+    device=0,
+    pad_token_id=pad_token_id
 )
 
 # 문서 로드 및 분할
@@ -155,9 +158,7 @@ async def chat(query: Query):
 
         response = pipe(formatted_prompt,
                         max_new_tokens=300,
-                        num_return_sequences=1,
-                        pad_token_id=tokenizer.eos_token_id
-                        )
+                        num_return_sequences=1)
         return {"response": response[0]['generated_text']}
     except Exception as e:
         return {"error": str(e)}
