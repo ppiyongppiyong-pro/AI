@@ -8,6 +8,9 @@ RUN apt-get update && \
     ln -s /usr/bin/python3 /usr/bin/python && \
     pip install --upgrade pip
 
+RUN pip install torch==2.2.2+cu121 --extra-index-url https://download.pytorch.org/whl/cu121 && \
+    pip cache purge
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
