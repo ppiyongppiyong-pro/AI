@@ -91,5 +91,5 @@ jobs:
             docker pull ${{ secrets.ECR_URI }}/ppiyong:latest
             
             # 3. docker compose
-            docker-compose down
-            docker-compose up -d --build
+            docker compose down
+            docker compose up -d --build
