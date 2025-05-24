@@ -91,7 +91,7 @@ pipe = pipeline(
 
 # 문서 로드 및 분할
 print("문서 로드 및 분할 중...")
-text_file_path = "./rag_data/knowledge.txt"
+text_file_path = "../../rag_data/knowledge.txt"
 documents = TextLoader(text_file_path, encoding='utf-8').load()
 
 def split_docs(documents, chunk_size=500, chunk_overlap=100):

@@ -13,7 +13,7 @@ from langchain.schema.runnable import RunnableMap, RunnableLambda, RunnableSeque
 
 # ========== 설정 ==========
 S3_BUCKET = "ppiyong-s3-bucket"
-S3_RAG_PATH = "rag_data/knowledge.txt"
+S3_RAG_PATH = "../../rag_data/knowledge.txt"
 S3_CHROMA_PREFIX = "chroma_db/"
 
 LOCAL_RAG_PATH = "/tmp/rag_data/knowledge.txt"
