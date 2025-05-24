@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+
+langchain
+langchain-community
+sentence-transformers
+chromadb
+peft==0.14.0
+accelerate
+
+transformers==4.43.1
+
+boto3

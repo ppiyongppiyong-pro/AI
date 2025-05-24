@@ -11,8 +11,7 @@ RUN apt-get update && \
 RUN pip install torch==2.2.2+cu121 --extra-index-url https://download.pytorch.org/whl/cu121 && \
     pip cache purge
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r chatbot/src/requirements.txt
 
 COPY . .
 
