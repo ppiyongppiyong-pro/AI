@@ -5,8 +5,9 @@ langchain
 langchain-community
 sentence-transformers
 chromadb
-peft
+peft==0.10.0
+accelerate
 
-transformers
+transformers==4.43.1
 
 boto3
