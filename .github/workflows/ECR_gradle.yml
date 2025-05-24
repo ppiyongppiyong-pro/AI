@@ -81,14 +81,16 @@ jobs:
             # 2. .env file
             echo "${{ secrets.ENV }}" > .env
             sudo chmod 600 .env
+            
+            # 3. aws login
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
 
-            # 3. Copy docker-compose.yml
+            # 4. Copy docker-compose.yml
             sudo cp /home/ubuntu/ppiyong-chatbot/docker-compose.yml /home/ubuntu/docker-compose.yml
 
-            #4. pull Image
+            # 5. pull Image
             docker pull ${{ secrets.ECR_URI }}/ppiyong:latest
 
-            # 3. docker compose
+            # 6. docker compose
             docker compose down
-            docker compose build --no-cache
-            docker compose up -d
+            docker compose up -d --build
