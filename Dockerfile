@@ -3,7 +3,8 @@ FROM nvidia/cuda:12.1.0-runtime-ubuntu20.04
 
 WORKDIR /ppiyong-chatbot
 
-RUN apt-get update && \
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu|http://mirror.kakao.com/ubuntu|g' /etc/apt/sources.list && \
+    apt-get update && \
     apt-get install -y python3 python3-pip git && \
     ln -s /usr/bin/python3 /usr/bin/python && \
     pip install --upgrade pip
