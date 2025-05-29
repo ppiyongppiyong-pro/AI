@@ -94,3 +94,6 @@ jobs:
             # 6. docker compose
             docker compose down
             docker compose up -d --build
+            
+            # 7. delete unused image
+            docker image prune -a
