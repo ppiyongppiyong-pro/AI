@@ -28,7 +28,7 @@ app = FastAPI(
 # CORS 허용
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8000", "http://localhost:5173", "http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "https://ppiyongppiyong.co.kr"],
     allow_methods=["GET", "POST", "PUT"],
     allow_headers=["Authorization", "Content-Type"],
     allow_credentials=True,
