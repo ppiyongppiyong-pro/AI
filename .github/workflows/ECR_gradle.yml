@@ -88,12 +88,15 @@ jobs:
             # 4. Copy docker-compose.yml
             sudo cp /home/ubuntu/ppiyong-chatbot/docker-compose.yml /home/ubuntu/docker-compose.yml
 
-            # 5. pull Image
+            # 5. export env
+            export ECR_URI=${{ secrets.ECR_URI }}
+            
+            # 6. pull Image
             docker pull ${{ secrets.ECR_URI }}/ppiyong:latest
 
-            # 6. docker compose
+            # 7. docker compose
             docker compose down
             docker compose up -d --build
             
-            # 7. delete unused image
+            # 8. delete unused image
             docker image prune -a
