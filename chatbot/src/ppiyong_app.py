@@ -117,6 +117,7 @@ class Query(BaseModel):
 @app.post("/api/ai/chat")
 async def chat(query: Query):
     try:
+        print("입력 내용:", query.input)
         torch.cuda.empty_cache()
         torch.cuda.ipc_collect()
         output = pipe(
@@ -126,6 +127,7 @@ async def chat(query: Query):
             pad_token_id=tokenizer.eos_token_id
         )
         raw = output[0]["generated_text"]
+        print("모델 응답:", raw)
         cleaned = clean_emergency_response(raw)
         return {"response": cleaned}
     except Exception as e:
