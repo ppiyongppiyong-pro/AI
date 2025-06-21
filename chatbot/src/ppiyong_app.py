@@ -28,7 +28,7 @@ app = FastAPI(
 # CORS 허용
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://ppiyongppiyong.co.kr"],
+    allow_origins=["http://localhost:3000", "http://localhost:5173", "https://ppiyongppiyong.co.kr"],
     allow_methods=["GET", "POST", "PUT"],
     allow_headers=["Authorization", "Content-Type"],
     allow_credentials=True,
@@ -78,15 +78,24 @@ def clean_emergency_response(text: str) -> str:
     matches = re.findall(r"\{[^{}]+\}", text)
     if not matches:
         return "대처방법:\n응급처치 방법을 인식하지 못했습니다."
-    try:
-        last_block = matches[-1]
-        parsed = ast.literal_eval(last_block)
-        if isinstance(parsed, dict):
-            items = sorted(parsed.items(), key=lambda x: int(x[0]))
-            steps = "\n".join([f"{k}. {v.strip()}" for k, v in items])
-            return f"대처방법:\n{steps}"
-    except Exception:
+
+    combined_dict = {}
+
+    for block in matches:
+        try:
+            parsed = ast.literal_eval(block)
+            if isinstance(parsed, dict):
+                combined_dict.update(parsed)
+        except Exception:
+            continue  # 무시하고 다음 블록 처리
+
+    if not combined_dict:
         return "대처방법:\n응급처치 정보를 해석하지 못했습니다."
+
+    # key를 숫자 순으로 정렬
+    items = sorted(combined_dict.items(), key=lambda x: int(x[0]))
+    steps = "\n".join([f"{k}. {v.strip()}" for k, v in items])
+    return f"대처방법:\n{steps}"
 
 # 테스트 함수 (로컬 테스트 용)
 def test_chat(input_text: str):
