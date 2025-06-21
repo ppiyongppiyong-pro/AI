@@ -28,7 +28,7 @@ app = FastAPI(
 # CORS 허용
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://ppiyongppiyong.co.kr"],
+    allow_origins=["http://localhost:3000", "http://localhost:5173", "https://ppiyongppiyong.co.kr"],
     allow_methods=["GET", "POST", "PUT"],
     allow_headers=["Authorization", "Content-Type"],
     allow_credentials=True,
@@ -70,7 +70,8 @@ print(" Pipeline 생성 중...")
 pipe = pipeline(
     "text-generation",
     model=model,
-    tokenizer=tokenizer
+    tokenizer=tokenizer,
+    return_full_text = False
 )
 
 # 응답 정제 함수
@@ -98,7 +99,8 @@ def test_chat(input_text: str):
             input_text,
             max_new_tokens=300,
             num_return_sequences=1,
-            pad_token_id=tokenizer.eos_token_id
+            pad_token_id=tokenizer.eos_token_id,
+            return_full_text = False
         )
         raw = output[0]["generated_text"]
         print("\n 원본 응답:\n", raw)
@@ -124,7 +126,8 @@ async def chat(query: Query):
             query.input,
             max_new_tokens=300,
             num_return_sequences=1,
-            pad_token_id=tokenizer.eos_token_id
+            pad_token_id=tokenizer.eos_token_id,
+            return_full_text = False
         )
         raw = output[0]["generated_text"]
         print("모델 응답:", raw)
