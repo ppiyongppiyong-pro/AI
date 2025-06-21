@@ -71,23 +71,26 @@ pipe = pipeline(
     "text-generation",
     model=model,
     tokenizer=tokenizer,
-    return_full_text = False
+    return_full_text=False
 )
 
 # 응답 정제 함수
 def clean_emergency_response(text: str) -> str:
-    matches = re.findall(r"\{[^{}]+\}", text)
-    if not matches:
-        return "대처방법:\n응급처치 방법을 인식하지 못했습니다."
     try:
-        last_block = matches[-1]
-        parsed = ast.literal_eval(last_block)
+        last_dict_start = text.rfind("{")
+        last_dict_end = text.find("}", last_dict_start)
+        if last_dict_start == -1 or last_dict_end == -1:
+            return f"대처방법:\n응급처치 방법을 인식하지 못했습니다.\n\n[원문 일부]: {text[-200:]}"
+        raw_dict = text[last_dict_start:last_dict_end+1]
+        parsed = ast.literal_eval(raw_dict)
         if isinstance(parsed, dict):
             items = sorted(parsed.items(), key=lambda x: int(x[0]))
             steps = "\n".join([f"{k}. {v.strip()}" for k, v in items])
             return f"대처방법:\n{steps}"
-    except Exception:
-        return "대처방법:\n응급처치 정보를 해석하지 못했습니다."
+        else:
+            return "대처방법:\n응급처치 정보를 해석할 수 없습니다."
+    except Exception as e:
+        return f"대처방법:\n응급처치 정보를 해석하지 못했습니다.\n\n[파싱 시도 블록]: {raw_dict}"
 
 # 테스트 함수 (로컬 테스트 용)
 def test_chat(input_text: str):
@@ -99,8 +102,7 @@ def test_chat(input_text: str):
             input_text,
             max_new_tokens=300,
             num_return_sequences=1,
-            pad_token_id=tokenizer.eos_token_id,
-            return_full_text = False
+            pad_token_id=tokenizer.eos_token_id
         )
         raw = output[0]["generated_text"]
         print("\n 원본 응답:\n", raw)
@@ -126,8 +128,7 @@ async def chat(query: Query):
             query.input,
             max_new_tokens=300,
             num_return_sequences=1,
-            pad_token_id=tokenizer.eos_token_id,
-            return_full_text = False
+            pad_token_id=tokenizer.eos_token_id
         )
         raw = output[0]["generated_text"]
         print("모델 응답:", raw)
