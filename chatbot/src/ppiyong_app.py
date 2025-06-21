@@ -71,14 +71,11 @@ pipe = pipeline(
     "text-generation",
     model=model,
     tokenizer=tokenizer,
-    return_full_text = False
+    return_full_text=False
 )
 
 # 응답 정제 함수
 def clean_emergency_response(text: str) -> str:
-    matches = re.findall(r"\{[^{}]+\}", text)
-    if not matches:
-        return "대처방법:\n응급처치 방법을 인식하지 못했습니다."
     try:
         last_dict_start = text.rfind("{")
         last_dict_end = text.find("}", last_dict_start)
@@ -105,8 +102,7 @@ def test_chat(input_text: str):
             input_text,
             max_new_tokens=300,
             num_return_sequences=1,
-            pad_token_id=tokenizer.eos_token_id,
-            return_full_text = False
+            pad_token_id=tokenizer.eos_token_id
         )
         raw = output[0]["generated_text"]
         print("\n 원본 응답:\n", raw)
@@ -132,8 +128,7 @@ async def chat(query: Query):
             query.input,
             max_new_tokens=300,
             num_return_sequences=1,
-            pad_token_id=tokenizer.eos_token_id,
-            return_full_text = False
+            pad_token_id=tokenizer.eos_token_id
         )
         raw = output[0]["generated_text"]
         print("모델 응답:", raw)
