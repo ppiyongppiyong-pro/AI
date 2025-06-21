@@ -1,21 +1,20 @@
 # Ndivida docker image - cuda 모델 설정
-FROM nvidia/cuda:12.1.0-runtime-ubuntu20.04
+FROM nvidia/cuda:12.5.0-runtime-ubuntu22.04
 
 WORKDIR /ppiyong-chatbot
 
-RUN sed -i 's|http://archive.ubuntu.com/ubuntu|http://mirror.kakao.com/ubuntu|g' /etc/apt/sources.list && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y python3 python3-pip git && \
     ln -s /usr/bin/python3 /usr/bin/python && \
-    pip install --upgrade pip
+    pip install --upgrade pip && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN pip install torch==2.2.2+cu121 --extra-index-url https://download.pytorch.org/whl/cu121 && \
+RUN pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --index-url https://download.pytorch.org/whl/cu121 && \
     pip cache purge
 
-COPY chatbot/src/requirements.txt ./chatbot/src/
-RUN pip install --no-cache-dir -r chatbot/src/requirements.txt
-
 COPY . .
+
+RUN pip install --no-cache-dir -r chatbot/src/requirements.txt
 
 EXPOSE 8000
 

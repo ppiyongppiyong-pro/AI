@@ -85,9 +85,9 @@ jobs:
             # 3. aws login
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
 
-            # 4. Copy docker-compose.yml
-            sudo cp /home/ubuntu/ppiyong-chatbot/docker-compose.yml /home/ubuntu/docker-compose.yml
-
+            # 4. export env
+            export ECR_URI=${{ secrets.ECR_URI }}
+            
             # 5. pull Image
             docker pull ${{ secrets.ECR_URI }}/ppiyong:latest
 
